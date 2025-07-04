@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .add-task-section {
+            padding: 30px;
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+        }
+
+        .add-task-form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .task-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            outline: none;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .task-input:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .add-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+            border: none;
+            border-radius: 50px;
+            color: #2d3436;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .task-list {
+            padding: 20px 30px 30px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .task-item {
+            background: white;
+            margin-bottom: 15px;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+            border-left: 5px solid transparent;
+        }
+
+        .task-item:nth-child(odd) {
+            border-left-color: #ff6b6b;
+        }
+
+        .task-item:nth-child(even) {
+            border-left-color: #4ecdc4;
+        }
+
+        .task-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .task-checkbox:checked {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            border-color: #00b894;
+        }
+
+        .task-checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .task-text {
+            flex: 1;
+            font-size: 1.1rem;
+            color: #2d3436;
+            transition: all 0.3s ease;
+            word-break: break-word;
+        }
+
+        .task-completed .task-text {
+            text-decoration: line-through;
+            color: #636e72;
+            opacity: 0.7;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .edit-btn, .delete-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .edit-btn {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+        }
+
+        .edit-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(116, 185, 255, 0.4);
+        }
+
+        .delete-btn {
+            background: linear-gradient(135deg, #fd79a8, #e84393);
+            color: white;
+        }
+
+        .delete-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(253, 121, 168, 0.4);
+        }
+
+        .edit-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid #74b9ff;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            outline: none;
+            background: #f8f9fa;
+        }
+
+        .save-btn, .cancel-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            color: white;
+            margin-right: 5px;
+        }
+
+        .cancel-btn {
+            background: linear-gradient(135deg, #636e72, #2d3436);
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #636e72;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #74b9ff;
+        }
+        .search-section {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .search-input {
+            width: 80%;
+            max-width: 500px;
+            padding: 10px 15px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #007BFF; /* Optional: change to match your theme */
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .add-task-section {
+                padding: 20px;
+            }
+
+            .add-task-form {
+                flex-direction: row;
+            }
+
+            .task-input {
+                flex: 1;
+                margin-bottom: 0;
+            }
+
+            .add-btn {
+                width: auto;
+                padding: 15px 25px;
+            }
+
+            .task-list {
+                padding: 15px 20px 20px;
+            }
+
+            .task-item {
+                padding: 15px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .task-actions {
+                width: 100%;
+                justify-content: flex-end;
+                margin-top: 10px;
+            }
+
+            .task-text {
+                font-size: 1rem;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .task-item {
+                padding: 12px;
+            }
+
+            .edit-btn, .delete-btn, .save-btn, .cancel-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Scrollbar Styling */
+        .task-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .task-list::-webkit-scrollbar-track {
+            background: #f1f2f6;
+            border-radius: 10px;
+        }
+
+        .task-list::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 10px;
+        }
+
+        .task-list::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #5a67d8, #6b46c1);
+        }
+    </style>
+</head>
+<body onload="display()">
+    <div class="container">
+        <div class="header">
+            <h1>✨ My To-Do List</h1>
+            <p>Stay organized and get things done!</p>
+        </div>
+
+        <div class="add-task-section">
+            <form class="add-task-form" onsubmit="event.preventDefault(); addtask()">
+                <input type="text" id="task" class="task-input" placeholder="What needs to be done?" required>
+                <button type="submit" class="add-btn" id="add-btn">Add Task</button>
+            </form>
+        </div>
+
+         <div class="search-section">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search tasks..." onkeyup="searchTask()">
+        </div>
+
+        <div class="task-list" id="taskList">
+            
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        
+        let selectedIndex = -1;
+        function addtask()
+        {
+            let task = document.getElementById('task').value
+            let btn_name = document.getElementById('add-btn').innerHTML
+            if(btn_name=="Add Task")
+            {
+
+                if(localStorage.getItem('alltask'))
+                {
+                    let alltask = JSON.parse(localStorage.getItem('alltask'))
+                    alltask.push(task)
+                    localStorage.setItem("alltask", JSON.stringify(alltask))
+                }
+                else{
+                    let alltask = []
+                    alltask.push(task)
+                    localStorage.setItem("alltask", JSON.stringify(alltask))
+                }
+                
+                Swal.fire({
+                    title: "The task has been added in your to-do List",
+                    icon: "success",
+                    draggable: true
+                });
+            }
+            else{
+                let alltask = JSON.parse(localStorage.getItem('alltask'))
+                alltask[selectedIndex] = task
+                localStorage.setItem("alltask", JSON.stringify(alltask))
+                Swal.fire({
+                    position: "middle-center",
+                    icon: "success",
+                    title: "Your task has been updated",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                document.getElementById('add-btn').innerHTML = 'Add Task' 
+            }  
+            display()
+            document.getElementById('task').value = ""
+        }
+
+        function display()
+        {
+            var alltask = JSON.parse(localStorage.getItem("alltask"))
+            temp = ""
+            if(alltask.length==0)
+            {
+                temp += `
+                    <div class="empty-state">
+                        <h3>🎯 Ready to be productive?</h3>
+                        <p>Add your first task above to get started!</p>
+                    </div>
+                `
+            }
+            for(let i=0; i<alltask.length; i++)
+            {
+                temp+=`
+                    <div class="task-item">                        
+                        <div class="task-text">${alltask[i]}</div>
+                        <div class="task-actions">
+                            <button class="edit-btn" onclick="editTask(${i})">Edit</button>
+                            <button class="delete-btn" onclick="deleteTask(${i})">Delete</button>
+                        </div>
+                    </div>
+                `
+            }
+            document.getElementById('taskList').innerHTML = temp
+        }
+
+        function deleteTask(index)
+        {
+           let alltask = JSON.parse(localStorage.getItem('alltask'))
+           Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    alltask.splice(index, 1)
+                    localStorage.setItem("alltask", JSON.stringify(alltask))
+                    Swal.fire({
+                        title: "Deleted!",
+                        text: "Your task has been deleted.",
+                        icon: "success"
+                    });
+                    display()
+                }
+            })        
+        }
+
+        function editTask(index)
+        {
+            let alltask = JSON.parse(localStorage.getItem('alltask'))
+            selectedIndex = index
+            document.getElementById('task').value = alltask[index]
+            document.getElementById('add-btn').innerHTML = 'Update'    
+        }
+
+        function searchTask()
+        {
+            let alltask = JSON.parse(localStorage.getItem('alltask'))
+            let search = document.getElementById('searchInput').value
+
+            temp = ""
+            if(alltask.length==0)
+            {
+                temp += `
+                    <div class="empty-state">
+                        <h3>🎯 Ready to be productive?</h3>
+                        <p>Add your first task above to get started!</p>
+                    </div>
+                `
+            }
+            for(let i=0; i<alltask.length; i++)
+            {
+                if(alltask[i].indexOf(search) > -1)
+                {
+                    temp+=`
+                        <div class="task-item">                        
+                            <div class="task-text">${alltask[i]}</div>
+                            <div class="task-actions">
+                                <button class="edit-btn" onclick="editTask(${i})">Edit</button>
+                                <button class="delete-btn" onclick="deleteTask(${i})">Delete</button>
+                            </div>
+                        </div>
+                    `
+                }
+            } 
+            document.getElementById('taskList').innerHTML = temp
+        }
+    </script>
+</body>
+</html>
